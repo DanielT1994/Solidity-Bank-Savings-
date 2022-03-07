@@ -19,6 +19,11 @@ pragma solidity ^0.5.0;
 
 // Define a new contract named `JointSavings`
 contract JointSavings {
+    address payable accountOne;
+    address payable accountTwo;
+    uint public lastWithdrawAmount;
+    uint public contractBalance;
+    address lastToWithdraw;
 
     /*
     Inside the new contract define the following variables:
@@ -34,6 +39,16 @@ contract JointSavings {
     - A `payable address` named `recipient`
     */
     function withdraw(uint amount, address payable recipient) public {
+        require (recipient == accountOne || recipient ==accountTwo, "You don't own this account!");
+        require (contractBalance > amount, "Not enough funds");
+        if (lastToWithdraw != recipient) {
+            lastToWithdraw = recipient;
+        }
+        recipient.transfer (amount);
+        lastWithdrawAmount = amount;
+        contractBalance = address(this).balance;
+
+
 
         /*
         Define a `require` statement that checks if the `recipient` is equal to either `accountOne` or `accountTwo`. The `requiere` statement returns the text `"You don't own this account!"` if it does not.
@@ -62,6 +77,7 @@ contract JointSavings {
 
     // Define a `public payable` function named `deposit`.
     function deposit() public payable {
+        contractBalance = address(this).balance;
 
         /*
         Call the `contractBalance` variable and set it equal to the balance of the contract by using `address(this).balance`.
@@ -73,6 +89,9 @@ contract JointSavings {
     Define a `public` function named `setAccounts` that receive two `address payable` arguments named `account1` and `account2`.
     */
     function setAccounts(address payable account1, address payable account2) public{
+       
+        accountOne = account1;
+        accountTwo = account2;
 
         // Set the values of `accountOne` and `accountTwo` to `account1` and `account2` respectively.
         // YOUR CODE HERE!
@@ -82,4 +101,6 @@ contract JointSavings {
     Finally, add the **default fallback function** so that your contract can store Ether sent from outside the deposit function.
     */
     // YOUR CODE HERE!
+    function() external payable {}
+
 }
